@@ -1,4 +1,5 @@
 import { useContext, useEffect } from "react"
+import { Can } from "../components/Can";
 import { AuthContext } from "../context/authContext"
 import { setupAPIClient } from "../services/api";
 import { api } from "../services/apiClient";
@@ -13,15 +14,21 @@ export default function Dashboard() {
             .catch(error => console.log(error))
 
     }, []);
-    return <h1>Dashboard: {user?.email}</h1>
+
+    return (
+        <>
+            <h1>Dashboard: {user?.email}</h1>
+            <Can permissions={['metrics.list']}>
+                <div>Métricas</div>
+            </Can>
+        </>
+    )
 }
 
 export const getServerSideProps = withSSRAuth(async (ctx) => {
     const apiClient = setupAPIClient(ctx)
 
     const response = await apiClient.get('/me')
-
-    console.log(response.data);
 
     return {
         props: {}

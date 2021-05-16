@@ -21,9 +21,10 @@ export function setupAPIClient(ctx = undefined) {
     }, (error: AxiosError) => {
         if (error.response.status === 401) {
             if (error.response.data?.code === 'token.expired') {
-                cookies = parseCookies()
+                cookies = parseCookies(ctx)
 
                 const { 'nextauth.refreshToken': refreshToken } = cookies;
+
 
                 const originalConfig = error.config
 
@@ -75,7 +76,11 @@ export function setupAPIClient(ctx = undefined) {
                     })
                 })
             } else {
-                signOut()
+                if (process.browser) {
+                    signOut()
+                } else {
+                    return Promise.reject(new AuthTokenError())
+                }
             }
         }
         return Promise.reject(error)
